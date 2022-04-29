@@ -6,15 +6,31 @@ namespace ImageColourSwap.Lambda
     {
         public static void Main()
         {
-
+            
         }
 
         [LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-        public string Handler(Stream request)
+        public string Handler(FileInputModel input, ILambdaContext context)
         {
-            ImageColourSwapCore core = new ImageColourSwapCore();
+            context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
+            context.Logger.LogInformation($"Source Image : {input.SourceImage}");
 
-            return "Testing...testing 1 2 3";
+            var imageHelper = new ImageHelper(new AWSS3ImageLoader());
+
+            imageHelper.LoadImages(
+                input.SourceImage, 
+                input.PalletteImage);
+
+            imageHelper.Resize();
+            context.Logger.LogInformation("Finished resizing image(s)");
+
+            var result = imageHelper.SaveImagesAsync().GetAwaiter().GetResult();
+            context.Logger.LogInformation("Images Saved");
+
+            imageHelper.CreateSortedImages().GetAwaiter().GetResult();
+            imageHelper.CreateOutputImage().GetAwaiter().GetResult();
+
+            return "Execution finished";
         }
     }
 }
