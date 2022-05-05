@@ -1,4 +1,6 @@
 ﻿using Amazon.Lambda.Core;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace ImageColourSwap.Lambda
 {
@@ -28,9 +30,18 @@ namespace ImageColourSwap.Lambda
             context.Logger.LogInformation("Images Saved");
 
             imageHelper.CreateSortedImages().GetAwaiter().GetResult();
-            imageHelper.CreateOutputImage().GetAwaiter().GetResult();
+            var outputFileName = imageHelper.CreateOutputImage().GetAwaiter().GetResult();
 
-            return "Execution finished";
+            GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
+            {
+                BucketName = "imagecolourswap",
+                Expires = DateTime.UtcNow.AddMinutes(1),
+                Key = outputFileName
+            };
+
+            AmazonS3Client client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
+            
+            return client.GetPreSignedURL(request);
         }
     }
 }
