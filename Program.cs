@@ -12,7 +12,7 @@ namespace ImageColourSwap.Lambda
         }
 
         [LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-        public string Handler(FileInputModel input, ILambdaContext context)
+        public ProcessingResultsModel Handler(FileInputModel input, ILambdaContext context)
         {
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");
@@ -32,16 +32,20 @@ namespace ImageColourSwap.Lambda
             imageHelper.CreateSortedImages().GetAwaiter().GetResult();
             var outputFileName = imageHelper.CreateOutputImage().GetAwaiter().GetResult();
 
-            GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
-            {
-                BucketName = "imagecolourswap",
-                Expires = DateTime.UtcNow.AddMinutes(1),
-                Key = outputFileName
-            };
+            var bucketName = "imagecolourswap";
+            var originalFilenames = imageHelper.GetSourceAndPalletteImageFilenames();
+            var urlGenerator = new AWSUrlGenerator();
+            var resultsModel = new ProcessingResultsModel();
+            context.Logger.LogInformation($"Getting url for {outputFileName}");
+            resultsModel.OutputImage = urlGenerator.GetUrl(bucketName, outputFileName);
+            context.Logger.LogInformation($"Getting url for {originalFilenames.Item1}");
+            resultsModel.PalletteImage = urlGenerator.GetUrl(bucketName, originalFilenames.Item2);
+            context.Logger.LogInformation($"Getting url for {originalFilenames.Item2}");
+            resultsModel.SourceImage = urlGenerator.GetUrl(bucketName, originalFilenames.Item1);
 
-            AmazonS3Client client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
-            
-            return client.GetPreSignedURL(request);
+            context.Logger.LogInformation("Returning Model");
+
+            return resultsModel;
         }
     }
 }
