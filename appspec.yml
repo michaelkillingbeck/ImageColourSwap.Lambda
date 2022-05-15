@@ -1,0 +1,7 @@
+version: 0.0
+os: linux
+Resources:
+  - MyFunction: ImageColourSwap
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: "ImageColourSwap"
