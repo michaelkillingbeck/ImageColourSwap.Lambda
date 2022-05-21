@@ -14,6 +14,7 @@ namespace ImageColourSwap.Lambda
         [LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
         public ProcessingResultsModel Handler(FileInputModel input, ILambdaContext context)
         {
+            context.Logger.LogInformation("Testing version 1...");
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");
 
