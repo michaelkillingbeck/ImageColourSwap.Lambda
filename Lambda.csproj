@@ -11,12 +11,9 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.3.0" /> 
     <PackageReference Include="AWSSDK.S3" Version="3.7.9.2" /> 
+    <PackageReference Include="imagecolourswap" Version="0.0.1.1" /> 
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
-  
-    <Reference Include="ImageColourSwap">
-      <HintPath>Dependencies\Image Colour Swap.dll</HintPath>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
+
   </ItemGroup>
 
 </Project>

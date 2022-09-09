@@ -3,3 +3,4 @@ bin/*
 Dependencies/*
 obj/*
 Publish/*
+.DS_Store
