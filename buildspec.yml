@@ -13,7 +13,7 @@ phases:
       -  dotnet nuget add source -n codeartifact $(aws codeartifact get-repository-endpoint --domain mk --domain-owner 267855555195 --repository ImageColourSwap --format nuget --query repositoryEndpoint --output text)"v3/index.json"
   build:
     commands:
-      - dotnet add imagecolourswap
+      - dotnet add package imagecolourswap
       - dotnet publish -o LambdaPackage
 artifacts:
   files:
