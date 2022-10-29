@@ -1,5 +1,6 @@
 .vscode/*
 bin/*
+.config/*
 Dependencies/*
 obj/*
 Publish/*

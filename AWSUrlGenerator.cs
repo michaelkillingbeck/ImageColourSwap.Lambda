@@ -10,7 +10,7 @@ public class AWSUrlGenerator
         GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
         {
             BucketName = bucketName,
-            Expires = DateTime.UtcNow.AddMinutes(1),
+            Expires = DateTime.UtcNow.AddMinutes(10),
             Key = objectName
         };
 
