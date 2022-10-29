@@ -49,6 +49,11 @@ public class AWSS3ImageLoader : IImageLoader
         }
     }
 
+    public Stream GenerateStream(string base64EncodedString)
+    {
+        throw new NotImplementedException();
+    }
+
     public IImageData LoadImage(string filepath)
     {
         var client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
