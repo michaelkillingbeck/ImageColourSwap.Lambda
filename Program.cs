@@ -14,7 +14,6 @@ namespace ImageColourSwap.Lambda
         [LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
         public ProcessingResultsModel Handler(FileInputModel input, ILambdaContext context)
         {
-            context.Logger.LogInformation("Testing version 1...");
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");
 
@@ -33,19 +32,14 @@ namespace ImageColourSwap.Lambda
             imageHelper.CreateSortedImages().GetAwaiter().GetResult();
             var outputFileName = imageHelper.CreateOutputImage().GetAwaiter().GetResult();
 
-            var bucketName = "imagecolourswap";
             var originalFilenames = imageHelper.GetSourceAndPalletteImageFilenames();
-            var urlGenerator = new AWSUrlGenerator();
+
             var resultsModel = new ProcessingResultsModel();
-            context.Logger.LogInformation($"Getting url for {outputFileName}");
-            resultsModel.OutputImage = urlGenerator.GetUrl(bucketName, outputFileName);
-            context.Logger.LogInformation($"Getting url for {originalFilenames.Item1}");
-            resultsModel.PalletteImage = urlGenerator.GetUrl(bucketName, originalFilenames.Item2);
-            context.Logger.LogInformation($"Getting url for {originalFilenames.Item2}");
-            resultsModel.SourceImage = urlGenerator.GetUrl(bucketName, originalFilenames.Item1);
+            resultsModel.OutputImage = outputFileName;
+            resultsModel.SourceImage = originalFilenames.Item1;
+            resultsModel.PalletteImage = originalFilenames.Item2;
 
             context.Logger.LogInformation("Returning Model");
-
             return resultsModel;
         }
     }
