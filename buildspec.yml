@@ -1,16 +1,28 @@
 version: 0.2
 
+env:
+  parameter-store:
+    CODE_ARTIFACT_DOMAIN: /CodeBuild/CodeArtifact/Domain
+    CODE_ARTIFACT_DOMAIN_OWNER: /CodeBuild/CodeArtifact/DomainOwner
+    CODE_ARTIFACT_REPOSITORY: /CodeBuild/CodeArtifact/Repository
+
 phases:
   install:
     runtime-versions:
       dotnet: latest
     commands:
-      - export PATH="$PATH:/root/.dotnet/tools"
+      - /usr/local/bin/dotnet-install.sh --channel LTS
       - dotnet tool install -g AWS.CodeArtifact.NuGet.CredentialProvider
       - dotnet codeartifact-creds install
   pre_build:
     commands:
-      -  dotnet nuget add source -n codeartifact $(aws codeartifact get-repository-endpoint --domain mk --domain-owner 267855555195 --repository ImageColourSwap --format nuget --query repositoryEndpoint --output text)"v3/index.json"
+      - dotnet nuget add source -n codeartifact $(aws codeartifact get-repository-endpoint 
+        --domain $CODE_ARTIFACT_DOMAIN 
+        --domain-owner $CODE_ARTIFACT_DOMAIN_OWNER 
+        --repository $CODE_ARTIFACT_REPOSITORY 
+        --format nuget 
+        --query repositoryEndpoint 
+        --output text)"v3/index.json"
   build:
     commands:
       - dotnet add package imagecolourswap
