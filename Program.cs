@@ -1,6 +1,6 @@
 ﻿using Amazon.Lambda.Core;
-using Amazon.S3;
-using Amazon.S3.Model;
+using ImageHelpers.Services.ImageColourSwap;
+using Web.Services;
 
 namespace ImageColourSwap.Lambda
 {
@@ -17,7 +17,12 @@ namespace ImageColourSwap.Lambda
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");
 
-            var imageHelper = new ImageHelper(new AWSS3ImageLoader());
+            var imageHelper = new ImageColourSwapImageHelper(
+                new AWSS3ImageLoader(),
+                new S3ImageSaver(new SettingsModel
+                {
+                    BucketName = Environment.GetEnvironmentVariable("BucketName") ?? string.Empty
+                }));
 
             imageHelper.LoadImages(
                 input.SourceImage, 
