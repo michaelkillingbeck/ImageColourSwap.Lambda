@@ -14,6 +14,7 @@ phases:
       - /usr/local/bin/dotnet-install.sh --channel LTS
       - dotnet tool install -g AWS.CodeArtifact.NuGet.CredentialProvider
       - dotnet codeartifact-creds install
+
   pre_build:
     commands:
       - dotnet nuget add source -n codeartifact $(aws codeartifact get-repository-endpoint 
@@ -23,10 +24,13 @@ phases:
         --format nuget 
         --query repositoryEndpoint 
         --output text)"v3/index.json"
+
   build:
     commands:
       - dotnet build Lambda.csproj
       - dotnet publish -o LambdaPackage
+      - aws s3 cp Code/Nuget/ s3://imagecolourswap/ImageColourSwapLambda/ --recursive --exclude "*" --include "LambdaPackage.zip"
+      
 artifacts:
   files:
     - '**/*'
