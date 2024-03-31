@@ -1,6 +1,5 @@
 ﻿using Amazon.Lambda.Core;
 using ImageHelpers.Services.ImageColourSwap;
-using Web.Services;
 
 namespace ImageColourSwap.Lambda
 {
