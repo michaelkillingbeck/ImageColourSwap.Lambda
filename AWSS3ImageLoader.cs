@@ -77,6 +77,11 @@ public class AWSS3ImageLoader : IImageHandler
         }
     }
 
+    public IImageData LoadImageFromBase64EncodedString(string base64EncodedString)
+    {
+        throw new NotImplementedException();
+    }
+    
     public IImageData Resize(IImageData sourceImage, IImageData targetImage)
     {
         using(var image = 
