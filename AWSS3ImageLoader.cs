@@ -9,7 +9,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace ImageColourSwap.Lambda;
 
-public class AWSS3ImageLoader : IImageLoader
+public class AWSS3ImageLoader : IImageHandler
 {
     public RgbPixelData[] CreatePixelData(IImageData imageData)
     {
