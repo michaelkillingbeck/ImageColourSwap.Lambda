@@ -25,7 +25,7 @@ phases:
         --output text)"v3/index.json"
   build:
     commands:
-      - dotnet add package imagecolourswap
+      - dotnet build Lambda.csproj
       - dotnet publish -o LambdaPackage
 artifacts:
   files:
