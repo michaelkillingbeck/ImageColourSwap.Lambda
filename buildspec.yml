@@ -36,6 +36,7 @@ phases:
       - dotnet pack --no-build --no-restore Lambda.csproj /p:OutputPath=Nuget -o Nuget
       - zip -r Lambda.zip Output
       - aws s3 cp Lambda.zip s3://imagecolourswap/ImageColourSwapLambda/
+      - dotnet nuget push Nuget/*.nupkg -s codeartifact --skip-duplicate
       
 artifacts:
   files:
