@@ -1,7 +1,7 @@
-using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Image_Colour_Swap.Interfaces;
+using ImageHelpers.Interfaces;
+using ImageHelpers.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
