@@ -27,9 +27,12 @@ phases:
 
   build:
     commands:
+      - rm -rf Nuget
+      - mkdir Nuget
+      - dotnet publish -o Nuget
       - dotnet build Lambda.csproj
-      - dotnet pack --no-build --no-restore Lambda.csproj /p:OutputPath=Site -o Code/Nuget
-      - aws s3 cp Code/Nuget s3://imagecolourswap/ImageColourSwapLambda/ --recursive --exclude "*" --include "*.nupkg"
+      - dotnet pack --no-build --no-restore Lambda.csproj /p:OutputPath=Nuget -o Nuget
+      - aws s3 cp Nuget s3://imagecolourswap/ImageColourSwapLambda/ --recursive --exclude "*" --include "*.nupkg"
       
 artifacts:
   files:
