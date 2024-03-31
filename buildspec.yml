@@ -29,7 +29,8 @@ phases:
     commands:
       - dotnet build Lambda.csproj
       - dotnet publish -o LambdaPackage
-      - aws s3 cp Code/Nuget/ s3://imagecolourswap/ImageColourSwapLambda/ --recursive --exclude "*" --include "LambdaPackage.zip"
+      - ls
+      - aws s3 cp LambdaPackage s3://imagecolourswap/ImageColourSwapLambda/ --recursive --exclude "*" --include "LambdaPackage.zip"
       
 artifacts:
   files:
