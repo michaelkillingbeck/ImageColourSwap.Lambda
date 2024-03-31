@@ -38,4 +38,3 @@ artifacts:
   files:
     - 'Nuget/Lambda.dll'
   name: 'Lambda'
-  base-directory: 'Lambda'
