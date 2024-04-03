@@ -20,19 +20,24 @@ public class AWSS3ImageLoader : IImageHandler
 
     public RgbPixelData[] CreatePixelData(IImageData imageData)
     {
-        using(var image = Image.LoadPixelData<Rgba32>(imageData.Bytes, imageData.Size.Width, imageData.Size.Height))
+        using(Image<Rgba32> image = 
+            Image.LoadPixelData<Rgba32>(
+                imageData.Bytes, imageData.Size.Width, imageData.Size.Height))
         {
-            Rgba32[] pixels = new Rgba32[0];
+            Rgba32[] pixels = Array.Empty<Rgba32>();
             pixels = new Rgba32[image.Width * image.Height];
             image.CopyPixelDataTo(pixels);
 
-            return pixels.Select(pixel => new RgbPixelData{ R = pixel.R, G = pixel.G, B = pixel.B }).ToArray<RgbPixelData>();
+            return pixels.Select(pixel => 
+                new RgbPixelData{ R = pixel.R, G = pixel.G, B = pixel.B }).ToArray();
         }
     }
 
     public Stream GenerateStream(IImageData sourceImage)
     {
-        using(var image = Image.LoadPixelData<Rgba32>(sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height))
+        using(Image<Rgba32> image = 
+            Image.LoadPixelData<Rgba32>(
+                sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height))
         {
             MemoryStream stream = new MemoryStream();
             image.Save(stream, new JpegEncoder());
@@ -45,9 +50,10 @@ public class AWSS3ImageLoader : IImageHandler
     {
         Rgba32[] imageSharpPixels =
             pixels.Select(pixel => new Rgba32 { R = pixel.R, G = pixel.G, B = pixel.B, A = 255 })
-            .ToArray<Rgba32>();
+            .ToArray();
 
-        using(var image = Image.LoadPixelData<Rgba32>(imageSharpPixels, imageData.Size.Width, imageData.Size.Height))
+        using(Image<Rgba32> image = 
+            Image.LoadPixelData(imageSharpPixels, imageData.Size.Width, imageData.Size.Height))
         {
             MemoryStream stream = new MemoryStream();
             image.Save(stream, new JpegEncoder());
@@ -63,24 +69,24 @@ public class AWSS3ImageLoader : IImageHandler
 
     public IImageData LoadImage(string filepath)
     {
-        var client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
+        AmazonS3Client client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
 
-        var getRequest = new GetObjectRequest
+        GetObjectRequest getRequest = new GetObjectRequest
         {
             BucketName = _settings.BucketName,
             Key = filepath
         };
 
-        var response = client.GetObjectAsync(getRequest).GetAwaiter().GetResult();
+        GetObjectResponse response = client.GetObjectAsync(getRequest).GetAwaiter().GetResult();
 
-        using(var bytes = response.ResponseStream)
+        using(Stream bytes = response.ResponseStream)
         {
-            var image = SixLabors.ImageSharp.Image.Load<Rgba32>(bytes, new JpegDecoder());
+            Image<Rgba32> image = Image.Load<Rgba32>(bytes, new JpegDecoder());
 
-            var byteArray = new byte[image.Width * image.Height * 4];
+            byte[] byteArray = new byte[image.Width * image.Height * 4];
             image.CopyPixelDataTo(byteArray);
 
-            return new InMemoryImageData($"{Guid.NewGuid().ToString()}.jpg", image.Width, image.Height, byteArray);
+            return new InMemoryImageData($"{Guid.NewGuid()}.jpg", image.Width, image.Height, byteArray);
         }
     }
 
@@ -91,14 +97,14 @@ public class AWSS3ImageLoader : IImageHandler
     
     public IImageData Resize(IImageData sourceImage, IImageData targetImage)
     {
-        using(var image = 
+        using(Image<Rgba32> image = 
             Image.LoadPixelData<Rgba32>(sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height))
-            {
-                image.Mutate(img => img.Resize(targetImage.Size.Width, targetImage.Size.Height));
-                var byteArray = new byte[image.Width * image.Height * 4];
-                image.CopyPixelDataTo(byteArray);
-                
-                return new InMemoryImageData(sourceImage.Filename, image.Width, image.Height, byteArray);
-            }
+        {
+            image.Mutate(img => img.Resize(targetImage.Size.Width, targetImage.Size.Height));
+            byte[] byteArray = new byte[image.Width * image.Height * 4];
+            image.CopyPixelDataTo(byteArray);
+            
+            return new InMemoryImageData(sourceImage.Filename, image.Width, image.Height, byteArray);
+        }
     }
 }

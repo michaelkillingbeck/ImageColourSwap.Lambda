@@ -8,8 +8,8 @@ public class ProcessingResultsModel
 
     public ProcessingResultsModel()
     {
-        OutputImage = String.Empty;
-        PalletteImage = String.Empty;
-        SourceImage = String.Empty;
+        OutputImage = string.Empty;
+        PalletteImage = string.Empty;
+        SourceImage = string.Empty;
     }
 }

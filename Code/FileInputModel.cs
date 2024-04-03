@@ -7,7 +7,7 @@ public class FileInputModel
 
     public FileInputModel()
     {
-        PalletteImage = String.Empty;
-        SourceImage = String.Empty;
+        PalletteImage = string.Empty;
+        SourceImage = string.Empty;
     }
 }

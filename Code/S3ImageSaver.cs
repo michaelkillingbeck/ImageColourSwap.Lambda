@@ -21,7 +21,7 @@ public class S3ImageSaver : IImageSaver
     {
         try
         {
-            var putRequest = new PutObjectRequest
+            PutObjectRequest putRequest = new PutObjectRequest
             {
                 BucketName = _settings.BucketName,
                 ContentType = "text/plain",
@@ -29,7 +29,7 @@ public class S3ImageSaver : IImageSaver
                 Key = filename
             };
 
-            var putResponse = await _client.PutObjectAsync(putRequest);
+            PutObjectResponse putResponse = await _client.PutObjectAsync(putRequest);
 
             return putResponse.HttpStatusCode == HttpStatusCode.OK;
         }

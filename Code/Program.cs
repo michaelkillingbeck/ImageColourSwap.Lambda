@@ -21,7 +21,7 @@ namespace ImageColourSwap.Lambda
                 BucketName = Environment.GetEnvironmentVariable("BucketName") ?? string.Empty
             };
 
-            var imageHelper = new ImageColourSwapImageHelper(
+            ImageColourSwapImageHelper imageHelper = new ImageColourSwapImageHelper(
                 new AWSS3ImageLoader(settings),
                 new S3ImageSaver(settings));
 
@@ -32,18 +32,20 @@ namespace ImageColourSwap.Lambda
             imageHelper.Resize();
             context.Logger.LogInformation("Finished resizing image(s)");
 
-            var result = imageHelper.SaveImagesAsync().GetAwaiter().GetResult();
+            bool _ = imageHelper.SaveImagesAsync().GetAwaiter().GetResult();
             context.Logger.LogInformation("Images Saved");
 
             imageHelper.CreateSortedImages().GetAwaiter().GetResult();
-            var outputFileName = imageHelper.CreateOutputImage().GetAwaiter().GetResult();
+            string outputFileName = imageHelper.CreateOutputImage().GetAwaiter().GetResult();
 
-            var originalFilenames = imageHelper.GetSourceAndPalletteImageFilenames();
+            Tuple<string, string> originalFilenames = imageHelper.GetSourceAndPalletteImageFilenames();
 
-            var resultsModel = new ProcessingResultsModel();
-            resultsModel.OutputImage = outputFileName;
-            resultsModel.SourceImage = originalFilenames.Item1;
-            resultsModel.PalletteImage = originalFilenames.Item2;
+            ProcessingResultsModel resultsModel = new ProcessingResultsModel
+            {
+                OutputImage = outputFileName,
+                SourceImage = originalFilenames.Item1,
+                PalletteImage = originalFilenames.Item2
+            };
 
             context.Logger.LogInformation("Returning Model");
             return resultsModel;

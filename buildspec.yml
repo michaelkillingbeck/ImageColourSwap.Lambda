@@ -27,14 +27,14 @@ phases:
 
   build:
     commands:
-      - rm -rf Nuget
-      - mkdir Nuget
-      - rm -rf Build
-      - mkdir Build
-      - dotnet publish -o Nuget
-      - dotnet build Lambda.csproj -o Build -c Release
-      - dotnet pack --no-build --no-restore Lambda.csproj /p:OutputPath=Nuget -o Nuget
-      - cd Build
+      - rm -rf Code/Nuget
+      - mkdir Code/Nuget
+      - rm -rf Code/Build
+      - mkdir Code/Build
+      - dotnet publish -o Code/Nuget
+      - dotnet build Code/Lambda.csproj -o Build -c Release
+      - dotnet pack --no-build --no-restore Code/Lambda.csproj /p:OutputPath=Code/Nuget -o Code/Nuget
+      - cd Code/Build
       - zip Lambda.zip *
       - aws s3 cp Lambda.zip s3://imagecolourswap/ImageColourSwapLambda/
       - cd ..

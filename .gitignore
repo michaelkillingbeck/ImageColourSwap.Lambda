@@ -1,5 +1,7 @@
 .vscode/*
 bin/*
+Code/bin/*
+Code/obj/*
 .config/*
 Dependencies/*
 obj/*
