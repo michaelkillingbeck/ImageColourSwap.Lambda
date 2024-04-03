@@ -1,6 +1,8 @@
 .vscode/*
 bin/*
 Code/bin/*
+Code/Build
+Code/Nuget
 Code/obj/*
 .config/*
 Dependencies/*
