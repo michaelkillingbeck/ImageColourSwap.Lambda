@@ -11,6 +11,13 @@ namespace ImageColourSwap.Lambda;
 
 public class AWSS3ImageLoader : IImageHandler
 {
+    private readonly SettingsModel _settings;
+
+    public AWSS3ImageLoader(SettingsModel settings)
+    {
+        _settings = settings;
+    }
+
     public RgbPixelData[] CreatePixelData(IImageData imageData)
     {
         using(var image = Image.LoadPixelData<Rgba32>(imageData.Bytes, imageData.Size.Width, imageData.Size.Height))
@@ -60,7 +67,7 @@ public class AWSS3ImageLoader : IImageHandler
 
         var getRequest = new GetObjectRequest
         {
-            BucketName = "imagecolourswap",
+            BucketName = _settings.BucketName,
             Key = filepath
         };
 

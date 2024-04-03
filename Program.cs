@@ -16,12 +16,14 @@ namespace ImageColourSwap.Lambda
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");
 
+            SettingsModel settings = new SettingsModel
+            {
+                BucketName = Environment.GetEnvironmentVariable("BucketName") ?? string.Empty
+            };
+
             var imageHelper = new ImageColourSwapImageHelper(
-                new AWSS3ImageLoader(),
-                new S3ImageSaver(new SettingsModel
-                {
-                    BucketName = Environment.GetEnvironmentVariable("BucketName") ?? string.Empty
-                }));
+                new AWSS3ImageLoader(settings),
+                new S3ImageSaver(settings));
 
             imageHelper.LoadImages(
                 input.SourceImage, 
