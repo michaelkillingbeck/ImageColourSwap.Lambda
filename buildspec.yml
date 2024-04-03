@@ -35,8 +35,8 @@ phases:
       - dotnet build Lambda.csproj -o Build -c Release
       - cd Build
       - zip Lambda.zip *
-      - cd ..
       - aws s3 cp Lambda.zip s3://imagecolourswap/ImageColourSwapLambda/
+      - cd ..
       - dotnet nuget push Nuget/*.nupkg -s codeartifact --skip-duplicate
       
 artifacts:
