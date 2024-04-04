@@ -9,7 +9,9 @@ using SixLabors.ImageSharp.Processing;
 
 namespace ImageColourSwap.Lambda;
 
+#pragma warning disable S101 // Types should be named in PascalCase
 public class AWSS3ImageLoader : IImageHandler
+#pragma warning restore S101 // Types should be named in PascalCase
 {
     private readonly SettingsModel _settings;
 
@@ -20,46 +22,55 @@ public class AWSS3ImageLoader : IImageHandler
 
     public RgbPixelData[] CreatePixelData(IImageData imageData)
     {
-        using(Image<Rgba32> image = 
-            Image.LoadPixelData<Rgba32>(
-                imageData.Bytes, imageData.Size.Width, imageData.Size.Height))
+        if (imageData == null)
         {
-            Rgba32[] pixels = Array.Empty<Rgba32>();
-            pixels = new Rgba32[image.Width * image.Height];
-            image.CopyPixelDataTo(pixels);
-
-            return pixels.Select(pixel => 
-                new RgbPixelData{ R = pixel.R, G = pixel.G, B = pixel.B }).ToArray();
+            throw new ArgumentNullException(nameof(imageData));
         }
+
+        using Image<Rgba32> image =
+            Image.LoadPixelData<Rgba32>(
+                imageData.Bytes, imageData.Size.Width, imageData.Size.Height);
+        Rgba32[] pixels;
+        pixels = new Rgba32[image.Width * image.Height];
+        image.CopyPixelDataTo(pixels);
+
+        return pixels.Select(pixel =>
+            new RgbPixelData { R = pixel.R, G = pixel.G, B = pixel.B }).ToArray();
     }
 
-    public Stream GenerateStream(IImageData sourceImage)
+    public Stream GenerateStream(IImageData imageData)
     {
-        using(Image<Rgba32> image = 
-            Image.LoadPixelData<Rgba32>(
-                sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height))
+        if (imageData == null)
         {
-            MemoryStream stream = new MemoryStream();
-            image.Save(stream, new JpegEncoder());
-
-            return stream;
+            throw new ArgumentNullException(nameof(imageData));
         }
+
+        using Image<Rgba32> image =
+            Image.LoadPixelData<Rgba32>(
+                imageData.Bytes, imageData.Size.Width, imageData.Size.Height);
+        MemoryStream stream = new();
+        image.Save(stream, new JpegEncoder());
+
+        return stream;
     }
 
     public Stream GenerateStream(RgbPixelData[] pixels, IImageData imageData)
     {
-        Rgba32[] imageSharpPixels =
+        if (imageData == null)
+        {
+            throw new ArgumentNullException(nameof(imageData));
+        }
+
+        ReadOnlySpan<Rgba32> imageSharpPixels =
             pixels.Select(pixel => new Rgba32 { R = pixel.R, G = pixel.G, B = pixel.B, A = 255 })
             .ToArray();
 
-        using(Image<Rgba32> image = 
-            Image.LoadPixelData(imageSharpPixels, imageData.Size.Width, imageData.Size.Height))
-        {
-            MemoryStream stream = new MemoryStream();
-            image.Save(stream, new JpegEncoder());
+        using Image<Rgba32> image =
+            Image.LoadPixelData(imageSharpPixels, imageData.Size.Width, imageData.Size.Height);
+        MemoryStream stream = new();
+        image.Save(stream, new JpegEncoder());
 
-            return stream;
-        }
+        return stream;
     }
 
     public Stream GenerateStream(string base64EncodedString)
@@ -69,42 +80,45 @@ public class AWSS3ImageLoader : IImageHandler
 
     public IImageData LoadImage(string filepath)
     {
-        AmazonS3Client client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
+        AmazonS3Client client = new(Amazon.RegionEndpoint.EUWest2);
 
-        GetObjectRequest getRequest = new GetObjectRequest
+        GetObjectRequest getRequest = new()
         {
             BucketName = _settings.BucketName,
-            Key = filepath
+            Key = filepath,
         };
 
         GetObjectResponse response = client.GetObjectAsync(getRequest).GetAwaiter().GetResult();
 
-        using(Stream bytes = response.ResponseStream)
-        {
-            Image<Rgba32> image = Image.Load<Rgba32>(bytes, new JpegDecoder());
+        using Stream bytes = response.ResponseStream;
+        Image<Rgba32> image = Image.Load<Rgba32>(new JpegDecoderOptions().GeneralOptions, bytes);
 
-            byte[] byteArray = new byte[image.Width * image.Height * 4];
-            image.CopyPixelDataTo(byteArray);
+        byte[] byteArray = new byte[image.Width * image.Height * 4];
+        image.CopyPixelDataTo(byteArray);
 
-            return new InMemoryImageData($"{Guid.NewGuid()}.jpg", image.Width, image.Height, byteArray);
-        }
+        client.Dispose();
+
+        return new InMemoryImageData($"{Guid.NewGuid()}.jpg", image.Width, image.Height, byteArray);
     }
 
     public IImageData LoadImageFromBase64EncodedString(string base64EncodedString)
     {
         throw new NotImplementedException();
     }
-    
+
     public IImageData Resize(IImageData sourceImage, IImageData targetImage)
     {
-        using(Image<Rgba32> image = 
-            Image.LoadPixelData<Rgba32>(sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height))
+        if (sourceImage == null)
         {
-            image.Mutate(img => img.Resize(targetImage.Size.Width, targetImage.Size.Height));
-            byte[] byteArray = new byte[image.Width * image.Height * 4];
-            image.CopyPixelDataTo(byteArray);
-            
-            return new InMemoryImageData(sourceImage.Filename, image.Width, image.Height, byteArray);
+            throw new ArgumentNullException(nameof(sourceImage));
         }
+
+        using Image<Rgba32> image =
+            Image.LoadPixelData<Rgba32>(sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height);
+        image.Mutate(img => img.Resize(targetImage.Size.Width, targetImage.Size.Height));
+        byte[] byteArray = new byte[image.Width * image.Height * 4];
+        image.CopyPixelDataTo(byteArray);
+
+        return new InMemoryImageData(sourceImage.Filename, image.Width, image.Height, byteArray);
     }
 }

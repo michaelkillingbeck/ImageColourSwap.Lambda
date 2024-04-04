@@ -31,9 +31,9 @@ phases:
       - mkdir Code/Nuget
       - rm -rf Code/Build
       - mkdir Code/Build
-      - dotnet publish Code/Lambda.csproj -o Code/Nuget
-      - dotnet build Code/Lambda.csproj -o Code/Build -c Release
-      - dotnet pack --no-restore Code/Lambda.csproj /p:OutputPath=Nuget -o Code/Nuget
+      - dotnet publish Code/ImageColourSwap.Lambda.csproj -o Code/Nuget
+      - dotnet build Code/ImageColourSwap.Lambda.csproj -o Code/Build -c Release
+      - dotnet pack --no-restore Code/ImageColourSwap.Lambda.csproj /p:OutputPath=Nuget -o Code/Nuget
       - cd Code/Build
       - zip Lambda.zip *
       - aws s3 cp Lambda.zip s3://imagecolourswap/ImageColourSwapLambda/
