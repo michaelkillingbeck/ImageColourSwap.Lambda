@@ -6,6 +6,7 @@ Code/Nuget
 Code/obj/*
 .config/*
 Dependencies/*
+Code/nuget.config
 obj/*
 Publish/*
 .DS_Store

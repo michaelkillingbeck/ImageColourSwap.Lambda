@@ -6,18 +6,11 @@ using System.Net;
 
 namespace ImageColourSwap.Lambda;
 
-public class S3ImageSaver : IImageSaver, IDisposable
+public class S3ImageSaver(SettingsModel settingsModel) : IImageSaver, IDisposable
 {
-    private readonly AmazonS3Client _client;
+    private readonly AmazonS3Client _client = new(RegionEndpoint.EUWest2);
     private bool _isDisposed;
-    private readonly SettingsModel _settings;
-
-    public S3ImageSaver(SettingsModel settings)
-    {
-        _client = new AmazonS3Client(RegionEndpoint.EUWest2);
-        _isDisposed = false;
-        _settings = settings;
-    }
+    private readonly SettingsModel _settings = settingsModel;
 
     public async Task<bool> SaveAsync(string filename, Stream imageStream)
     {
@@ -37,8 +30,8 @@ public class S3ImageSaver : IImageSaver, IDisposable
         }
         catch (AmazonS3Exception ex)
         {
-            Console.Error.WriteLine($"Error saving {filename}");
-            Console.Error.WriteLine(ex.Message);
+            await Console.Error.WriteLineAsync($"Error saving {filename}").ConfigureAwait(false);
+            await Console.Error.WriteLineAsync(ex.Message).ConfigureAwait(false);
 
             return false;
         }

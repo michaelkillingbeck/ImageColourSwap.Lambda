@@ -16,15 +16,9 @@ namespace ImageColourSwap.Lambda
         public ProcessingResultsModel Handler(FileInputModel input, ILambdaContext context)
 #pragma warning restore CA1822 // Mark members as static
         {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
 
-            if (input is null)
-            {
-                throw new ArgumentNullException(nameof(input));
-            }
+            ArgumentNullException.ThrowIfNull(input);
 
             context.Logger.LogInformation($"Pallette Image : {input.PalletteImage}");
             context.Logger.LogInformation($"Source Image : {input.SourceImage}");

@@ -10,22 +10,14 @@ using SixLabors.ImageSharp.Processing;
 namespace ImageColourSwap.Lambda;
 
 #pragma warning disable S101 // Types should be named in PascalCase
-public class AWSS3ImageLoader : IImageHandler
+public class AWSS3ImageLoader(SettingsModel settingsModel) : IImageHandler
 #pragma warning restore S101 // Types should be named in PascalCase
 {
-    private readonly SettingsModel _settings;
-
-    public AWSS3ImageLoader(SettingsModel settings)
-    {
-        _settings = settings;
-    }
+    private readonly SettingsModel _settings = settingsModel;
 
     public RgbPixelData[] CreatePixelData(IImageData imageData)
     {
-        if (imageData == null)
-        {
-            throw new ArgumentNullException(nameof(imageData));
-        }
+        ArgumentNullException.ThrowIfNull(imageData);
 
         using Image<Rgba32> image =
             Image.LoadPixelData<Rgba32>(
@@ -40,10 +32,7 @@ public class AWSS3ImageLoader : IImageHandler
 
     public Stream GenerateStream(IImageData imageData)
     {
-        if (imageData == null)
-        {
-            throw new ArgumentNullException(nameof(imageData));
-        }
+        ArgumentNullException.ThrowIfNull(imageData);
 
         using Image<Rgba32> image =
             Image.LoadPixelData<Rgba32>(
@@ -56,10 +45,7 @@ public class AWSS3ImageLoader : IImageHandler
 
     public Stream GenerateStream(RgbPixelData[] pixels, IImageData imageData)
     {
-        if (imageData == null)
-        {
-            throw new ArgumentNullException(nameof(imageData));
-        }
+        ArgumentNullException.ThrowIfNull(imageData);
 
         ReadOnlySpan<Rgba32> imageSharpPixels =
             pixels.Select(pixel => new Rgba32 { R = pixel.R, G = pixel.G, B = pixel.B, A = 255 })
@@ -108,10 +94,7 @@ public class AWSS3ImageLoader : IImageHandler
 
     public IImageData Resize(IImageData sourceImage, IImageData targetImage)
     {
-        if (sourceImage == null)
-        {
-            throw new ArgumentNullException(nameof(sourceImage));
-        }
+        ArgumentNullException.ThrowIfNull(sourceImage);
 
         using Image<Rgba32> image =
             Image.LoadPixelData<Rgba32>(sourceImage.Bytes, sourceImage.Size.Width, sourceImage.Size.Height);
